@@ -1,0 +1,21 @@
+# Android fstab for everpal recovery.
+# Logical partitions and the userdata/metadata lines match crDroid 12.11 (lineage-23.2) exactly,
+# so FBEv2 + metadata decryption uses the same options the ROM formatted /data with.
+# Do NOT add system_dlkm / odm_dlkm: everpal ROMs have no such logical partitions.
+#
+#<src>						<mnt_point>			<type>		<mnt_flags>														<fs_mgr_flags>
+system						/system				ext4		noatime,ro														wait,avb=vbmeta_system,logical,first_stage_mount,avb_keys=/avb/q-developer-gsi.avbpubkey:/avb/r-developer-gsi.avbpubkey:/avb/s-developer-gsi.avbpubkey,slotselect
+system_ext					/system_ext			ext4		noatime,ro														wait,avb,logical,first_stage_mount,slotselect
+vendor						/vendor				ext4		noatime,ro														wait,avb,logical,first_stage_mount,slotselect
+vendor_dlkm					/vendor_dlkm			ext4		noatime,ro														wait,avb,logical,first_stage_mount,slotselect
+odm						/odm				ext4		noatime,ro														wait,avb,logical,first_stage_mount,slotselect
+product						/product			ext4		noatime,ro														wait,avb,logical,first_stage_mount,slotselect
+
+/dev/block/by-name/metadata			/metadata			ext4		noatime,nosuid,nodev,discard,data=journal,commit=1									wait,check,formattable,first_stage_mount
+/dev/block/by-name/userdata			/data				f2fs		noatime,nosuid,nodev,discard,fsync_mode=nobarrier,reserve_root=134217,resgid=1065,inlinecrypt		wait,check,formattable,reservedsize=128m,latemount,checkpoint=fs,fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized,keydirectory=/metadata/vold/metadata_encryption,fsverity
+
+/dev/block/by-name/misc				/misc				emmc		defaults														defaults
+
+# Removable storage, matched by sysfs path (same as crDroid's recovery.fstab)
+/devices/platform/externdevice*		auto			auto		defaults														voldmanaged=sdcard1:auto,encryptable=userdata
+/devices/platform/mt_usb*			auto			vfat		defaults														voldmanaged=usbotg:auto

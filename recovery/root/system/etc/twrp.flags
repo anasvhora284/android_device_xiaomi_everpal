@@ -1,0 +1,46 @@
+# TWRP partition flags for everpal (MT6833).
+#
+# Safety rules for this file:
+#  * Bootloader-chain partitions (preloader, lk/lk2, tee1/2, scp, sspm, dpm, mcupm, gz, spmfw,
+#    efuse, seccfg, otp, pi_img) are deliberately NOT listed: flashing or wiping any of them can
+#    hard-brick a MediaTek phone, and no recovery feature needs them.
+#  * IMEI / calibration partitions (nvram, nvdata, nvcfg, protect_f/s, persist, proinfo, md1img)
+#    are backup-only (no wipe, no image flashing except the explicit "image" entries below),
+#    so a backup can restore lost IMEI / baseband.
+#
+#<src>				<mnt_point>	<device>						<flags>
+
+# Boot (recovery-as-boot) / vbmeta
+/boot				emmc		/dev/block/by-name/boot					flags=display="Boot";backup=1;flashimg=1;slotselect
+/vbmeta				emmc		/dev/block/by-name/vbmeta				flags=display="VBMeta";backup=1;flashimg=1
+/vbmeta_system			emmc		/dev/block/by-name/vbmeta_system			flags=display="VBMeta System";backup=1;flashimg=1;slotselect
+/vbmeta_vendor			emmc		/dev/block/by-name/vbmeta_vendor			flags=display="VBMeta Vendor";backup=1;flashimg=1;slotselect
+/dtbo				emmc		/dev/block/by-name/dtbo					flags=display="DTBO";backup=1;flashimg=1
+
+# Logical partitions as raw images (backup / restore of a whole ROM slot)
+/system_image			emmc		/dev/block/mapper/system				flags=display="System Image";backup=1;flashimg=1;slotselect
+/system_ext_image		emmc		/dev/block/mapper/system_ext				flags=display="System_ext Image";backup=1;flashimg=1;slotselect
+/product_image			emmc		/dev/block/mapper/product				flags=display="Product Image";backup=1;flashimg=1;slotselect
+/vendor_image			emmc		/dev/block/mapper/vendor				flags=display="Vendor Image";backup=1;flashimg=1;slotselect
+/vendor_dlkm_image		emmc		/dev/block/mapper/vendor_dlkm				flags=display="Vendor_dlkm Image";backup=1;flashimg=1;slotselect
+/odm_image			emmc		/dev/block/mapper/odm					flags=display="ODM Image";backup=1;flashimg=1;slotselect
+
+# Internal storage
+/storage			f2fs		/data/media/0						flags=display="Internal Storage";backup=1;usermrf;fsflags="bind";removable
+
+# IMEI / modem / calibration — backup only
+/nvram				emmc		/dev/block/by-name/nvram				flags=display="NVRAM (IMEI)";backup=1
+/nvdata				ext4		/dev/block/by-name/nvdata				flags=display="NVDATA";backup=1
+/nvcfg				ext4		/dev/block/by-name/nvcfg				flags=display="NVCFG";backup=1
+/protect_f			ext4		/dev/block/by-name/protect1				flags=display="Protect_f";backup=1
+/protect_s			ext4		/dev/block/by-name/protect2				flags=display="Protect_s";backup=1
+/persist			ext4		/dev/block/by-name/persist				flags=display="Persist";backup=1
+/proinfo			emmc		/dev/block/by-name/proinfo				flags=display="Proinfo";backup=1
+/md1img				emmc		/dev/block/by-name/md1img				flags=display="Modem (md1img)";backup=1;flashimg=1
+
+# Misc
+/frp				emmc		/dev/block/by-name/frp					flags=display="FRP";backup=1
+/logo				emmc		/dev/block/by-name/logo					flags=display="Logo";backup=1;flashimg=1
+
+# Removable storage: matched by sysfs path in recovery.fstab (never a fixed /dev/block node;
+# on this UFS phone /dev/block/sda* is internal flash).
