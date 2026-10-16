@@ -12,10 +12,10 @@
 
 # Boot (recovery-as-boot) / vbmeta
 /boot				emmc		/dev/block/by-name/boot					flags=display="Boot";backup=1;flashimg=1;slotselect
-/vbmeta				emmc		/dev/block/by-name/vbmeta				flags=display="VBMeta";backup=1;flashimg=1
+/vbmeta				emmc		/dev/block/by-name/vbmeta				flags=display="VBMeta";backup=1;flashimg=1;slotselect
 /vbmeta_system			emmc		/dev/block/by-name/vbmeta_system			flags=display="VBMeta System";backup=1;flashimg=1;slotselect
 /vbmeta_vendor			emmc		/dev/block/by-name/vbmeta_vendor			flags=display="VBMeta Vendor";backup=1;flashimg=1;slotselect
-/dtbo				emmc		/dev/block/by-name/dtbo					flags=display="DTBO";backup=1;flashimg=1
+/dtbo				emmc		/dev/block/by-name/dtbo					flags=display="DTBO";backup=1;flashimg=1;slotselect
 
 # Logical partitions as raw images (backup / restore of a whole ROM slot)
 /system_image			emmc		/dev/block/mapper/system				flags=display="System Image";backup=1;flashimg=1;slotselect
@@ -36,11 +36,11 @@
 /protect_s			ext4		/dev/block/by-name/protect2				flags=display="Protect_s";backup=1
 /persist			ext4		/dev/block/by-name/persist				flags=display="Persist";backup=1
 /proinfo			emmc		/dev/block/by-name/proinfo				flags=display="Proinfo";backup=1
-/md1img				emmc		/dev/block/by-name/md1img				flags=display="Modem (md1img)";backup=1;flashimg=1
+/md1img				emmc		/dev/block/by-name/md1img				flags=display="Modem (md1img)";backup=1;flashimg=1;slotselect
 
 # Misc
 /frp				emmc		/dev/block/by-name/frp					flags=display="FRP";backup=1
-/logo				emmc		/dev/block/by-name/logo					flags=display="Logo";backup=1;flashimg=1
+/logo				emmc		/dev/block/by-name/logo					flags=display="Logo";backup=1;flashimg=1;slotselect
 
 # Removable storage: matched by sysfs path in recovery.fstab (never a fixed /dev/block node;
 # on this UFS phone /dev/block/sda* is internal flash).
