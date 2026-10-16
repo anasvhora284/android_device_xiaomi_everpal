@@ -125,10 +125,15 @@ BOARD_AVB_BOOT_ALGORITHM := SHA256_RSA2048
 BOARD_AVB_BOOT_ROLLBACK_INDEX := 1
 BOARD_AVB_BOOT_ROLLBACK_INDEX_LOCATION := 1
 
-# Security patch / version spoof so recovery never refuses to decrypt newer data (anti-rollback)
-PLATFORM_SECURITY_PATCH := 2127-12-31
-VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
-PLATFORM_VERSION := 99.87.36
+# OS version / patch levels: MUST equal what the phone boots with (boot header 16.0.0 / 2026-08,
+# ro.vendor.build.security_patch 2024-02-01 on crDroid 12.11). The Beanpod TEE binds keys to these.
+# The usual TWRP spoof (99.87.36 / 2127-12-31) made the TEE answer KEY_REQUIRES_UPGRADE (-62) for the
+# /metadata key on a real test: had the upgraded blob been saved, the ROM could no longer unlock /data.
+# Equal values never trigger an upgrade; if the ROM later gets a newer patch, decryption just fails
+# (no writes) until this is bumped and the recovery rebuilt.
+PLATFORM_SECURITY_PATCH := 2026-08-01
+VENDOR_SECURITY_PATCH := 2024-02-01
+PLATFORM_VERSION := 16
 PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
 
 # Decryption — FBEv2 + metadata encryption via MediaTek Microtrust/Beanpod keymaster 4.1
