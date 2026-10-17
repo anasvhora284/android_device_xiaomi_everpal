@@ -1,0 +1,36 @@
+//
+// SPDX-License-Identifier: BSD-3-Clause
+//
+// Recovery-only QTI AIDL vibrator service for everpal's "awinic_haptic" FF input device.
+// Sources: LineageOS android_vendor_qcom_opensource_vibrator lineage-19.1 @ 1a1e0f178b3e
+// (aidl/ + effect/), plus the device-name change of upstream commit ab699eb513.
+//
+// Built as one system binary with a unique name: PBRP's manifest already ships
+// vendor/qcom/opensource/vibrator, whose module names would otherwise clash.
+// TWRP relinks it into the recovery ramdisk (TW_RECOVERY_ADDITIONAL_RELINK_BINARY_FILES).
+//
+
+cc_binary {
+    name: "vibrator-service.everpal-recovery",
+    srcs: [
+        "aidl/service.cpp",
+        "aidl/Vibrator.cpp",
+        "effect/effect.cpp",
+    ],
+    local_include_dirs: [
+        "aidl/include",
+        "effect",
+    ],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    shared_libs: [
+        "libbase",
+        "libbinder_ndk",
+        "libcutils",
+        "liblog",
+        "libutils",
+        "android.hardware.vibrator-V1-ndk_platform",
+    ],
+}

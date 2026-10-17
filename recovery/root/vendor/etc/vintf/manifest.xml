@@ -9,6 +9,10 @@
         <transport>hwbinder</transport>
         <fqname>@4.1::IKeymasterDevice/default</fqname>
     </hal>
+    <hal format="aidl">
+        <name>android.hardware.vibrator</name>
+        <fqname>IVibrator/default</fqname>
+    </hal>
     <sepolicy>
         <version>31.0</version>
     </sepolicy>

@@ -170,6 +170,18 @@ TW_MAX_BRIGHTNESS := 2047
 TW_DEFAULT_BRIGHTNESS := 1024
 TW_EXCLUDE_DEFAULT_USB_INIT := true
 
+# Haptics: TWRP's AIDL client -> vibrator/ service -> awinic_haptic FF input device
+TW_SUPPORT_INPUT_AIDL_HAPTICS := true
+TW_RECOVERY_ADDITIONAL_RELINK_BINARY_FILES += \
+    $(TARGET_OUT_EXECUTABLES)/vibrator-service.everpal-recovery
+TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
+    $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.vibrator-V1-ndk_platform.so
+
+# Battery %: the MT6833 gauge only reports capacity once MediaTek's fuelgauged (32-bit) runs, and its
+# companion fuelgauged_nvram writes calibration to nvdata (IMEI partition) -- never done from here.
+# Without it capacity reads -1, so hide the number instead of showing a wrong value.
+TW_NO_BATT_PERCENT := true
+
 # Boot mode. TWRP's first-stage init only ignores the bootloader's force_normal_boot when the
 # cmdline has twrpfastboot=1, so one image cannot be both "fastboot boot"-testable and flashable:
 #   EVERPAL_RAMBOOT_TEST=1  -> always boots recovery; ONLY for `fastboot boot` (never flash it:
