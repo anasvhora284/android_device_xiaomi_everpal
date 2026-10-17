@@ -12,6 +12,7 @@ on post-fs
 on boot
     start health-hal-2-1
     start vibrator-everpal
+    start fuelgauged
 
 on property:hwservicemanager.ready=true
     start teei_daemon
@@ -60,5 +61,17 @@ service keymaster-4-1-beanpod /vendor/bin/hw/android.hardware.keymaster@4.1-serv
 service vibrator-everpal /system/bin/vibrator-service.everpal-recovery
     user root
     group root input
+    disabled
+    seclabel u:r:recovery:s0
+
+# MediaTek GM3.0 battery gauge: the kernel reports capacity only while fuelgauged runs.
+# 32-bit, so it runs through the bundled 32-bit loader/libs in /system/lib (the recovery is 64-bit;
+# its ld.config only covers lib64). fuelgauged_nvram is NOT shipped and nvcfg/nvdata are never
+# mounted here, so libfgauge_gm30's calibration writes under /mnt/vendor/nvcfg can't reach the
+# partition (verified on device: "nvcfg is not mounted", "Save old_data fail", capacity correct).
+service fuelgauged /system/bin/linker /vendor/bin/fuelgauged
+    setenv LD_LIBRARY_PATH /system/lib:/vendor/lib
+    user root
+    group root system
     disabled
     seclabel u:r:recovery:s0

@@ -5,8 +5,8 @@
 #    efuse, seccfg, otp, pi_img) are deliberately NOT listed: flashing or wiping any of them can
 #    hard-brick a MediaTek phone, and no recovery feature needs them.
 #  * IMEI / calibration partitions (nvram, nvdata, nvcfg, protect_f/s, persist, proinfo, md1img)
-#    are backup-only (no wipe, no image flashing except the explicit "image" entries below),
-#    so a backup can restore lost IMEI / baseband.
+#    are backup-only raw images (emmc: never mounted, so nothing can write into them and a
+#    restore is byte-exact), so a backup can restore lost IMEI / baseband.
 #
 #<src>				<mnt_point>	<device>						<flags>
 
@@ -30,11 +30,11 @@
 
 # IMEI / modem / calibration — backup only
 /nvram				emmc		/dev/block/by-name/nvram				flags=display="NVRAM (IMEI)";backup=1
-/nvdata				ext4		/dev/block/by-name/nvdata				flags=display="NVDATA";backup=1
-/nvcfg				ext4		/dev/block/by-name/nvcfg				flags=display="NVCFG";backup=1
-/protect_f			ext4		/dev/block/by-name/protect1				flags=display="Protect_f";backup=1
-/protect_s			ext4		/dev/block/by-name/protect2				flags=display="Protect_s";backup=1
-/persist			ext4		/dev/block/by-name/persist				flags=display="Persist";backup=1
+/nvdata				emmc		/dev/block/by-name/nvdata				flags=display="NVDATA";backup=1
+/nvcfg				emmc		/dev/block/by-name/nvcfg				flags=display="NVCFG";backup=1
+/protect_f			emmc		/dev/block/by-name/protect1				flags=display="Protect_f";backup=1
+/protect_s			emmc		/dev/block/by-name/protect2				flags=display="Protect_s";backup=1
+/persist			emmc		/dev/block/by-name/persist				flags=display="Persist";backup=1
 /proinfo			emmc		/dev/block/by-name/proinfo				flags=display="Proinfo";backup=1
 /md1img				emmc		/dev/block/by-name/md1img				flags=display="Modem (md1img)";backup=1;flashimg=1;slotselect
 
