@@ -42,5 +42,9 @@
 /frp				emmc		/dev/block/by-name/frp					flags=display="FRP";backup=1
 /logo				emmc		/dev/block/by-name/logo					flags=display="Logo";backup=1;flashimg=1;slotselect
 
-# Removable storage: matched by sysfs path in recovery.fstab (never a fixed /dev/block node;
-# on this UFS phone /dev/block/sda* is internal flash).
+# MicroSD. Internal storage on evergo is UFS (sda/sdb/sdc), so mmcblk0 is always the SD card
+# (verified: /sys/block = mmcblk0 sda sdb sdc, mmcblk0 under /devices/platform/externdevice).
+# A sysfs match worked but showed the card as "Storage 1" plus a broken whole-disk "Storage" entry.
+/external_sd			vfat		/dev/block/mmcblk0p1	/dev/block/mmcblk0		flags=display="MicroSD";storage;wipeingui;removable
+
+# USB-OTG: matched by sysfs path in recovery.fstab (never a fixed /dev/block/sdX node).
