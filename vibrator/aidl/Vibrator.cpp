@@ -31,12 +31,14 @@
 
 #include <cutils/properties.h>
 #include <dirent.h>
+#include <fcntl.h>  // everpal: open()/O_*; upstream relied on a transitive include absent here
 #include <inttypes.h>
 #include <linux/input.h>
 #include <log/log.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <thread>
+#include <unistd.h>  // everpal: close()/write()
 
 #include "include/Vibrator.h"
 #ifdef USE_EFFECT_STREAM
