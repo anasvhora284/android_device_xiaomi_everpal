@@ -15,13 +15,15 @@ on boot
     start fuelgauged
 
 # Keymaster must see the installed ROM's version/patch levels before it starts (prepdecrypt-everpal.sh).
+# teei_daemon + gatekeeper don't depend on version/patch levels: start them at once, from the recovery's own
+# /vendor (PBRP later mounts the ROM's vendor over it, which has no gatekeeper@1.0-service-recovery).
 on property:hwservicemanager.ready=true
+    start teei_daemon
+    start gatekeeper-1-0
     start prepdecrypt-everpal
 
 on property:vendor.prepdecrypt.everpal.done=1
-    start teei_daemon
     start keymaster-4-1-beanpod
-    start gatekeeper-1-0
 
 service prepdecrypt-everpal /system/bin/prepdecrypt-everpal.sh
     oneshot
