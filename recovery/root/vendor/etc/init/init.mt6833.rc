@@ -14,10 +14,21 @@ on boot
     start vibrator-everpal
     start fuelgauged
 
+# Keymaster must see the installed ROM's version/patch levels before it starts (prepdecrypt-everpal.sh).
 on property:hwservicemanager.ready=true
+    start prepdecrypt-everpal
+
+on property:prepdecrypt.everpal.done=1
     start teei_daemon
     start keymaster-4-1-beanpod
     start gatekeeper-1-0
+
+service prepdecrypt-everpal /system/bin/prepdecrypt-everpal.sh
+    oneshot
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
 
 # After decryption only the TEE services are stopped. servicemanager/hwservicemanager must keep
 # running: update_engine_sideload reaches IBootControl through hwservicemanager (A/B ROM installs)
