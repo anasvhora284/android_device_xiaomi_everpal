@@ -9,8 +9,11 @@ setp() { [ -n "$2" ] && [ "$(getprop "$1")" != "$2" ] && resetprop "$1" "$2" && 
 getv() { grep -m1 "^$1=" "$2" 2>/dev/null | cut -d= -f2-; }
 
 S=; V=
-for i in $(seq 1 40); do   # TWRP maps the logical partitions while processing the fstab
-	[ -b /dev/block/mapper/system ] && [ -b /dev/block/mapper/vendor ] && { S=/dev/block/mapper/system; V=/dev/block/mapper/vendor; break; }
+SL=$(getprop ro.boot.slot_suffix)
+for i in $(seq 1 40); do   # TWRP maps the logical partitions (as <name>_<slot>) while processing the fstab
+	for n in "$SL" ""; do
+		[ -b /dev/block/mapper/system$n ] && [ -b /dev/block/mapper/vendor$n ] && { S=/dev/block/mapper/system$n; V=/dev/block/mapper/vendor$n; break 2; }
+	done
 	sleep 0.5
 done
 if [ -n "$S" ]; then
@@ -27,4 +30,4 @@ if [ -n "$S" ]; then
 else
 	log "ROM partitions not found, using built-in version/patch"
 fi
-setprop prepdecrypt.everpal.done 1
+setprop vendor.prepdecrypt.everpal.done 1   # vendor.* : readable by vendor_init (rc lives in /vendor)

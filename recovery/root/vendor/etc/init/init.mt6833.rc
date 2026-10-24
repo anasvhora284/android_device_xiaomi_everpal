@@ -18,7 +18,7 @@ on boot
 on property:hwservicemanager.ready=true
     start prepdecrypt-everpal
 
-on property:prepdecrypt.everpal.done=1
+on property:vendor.prepdecrypt.everpal.done=1
     start teei_daemon
     start keymaster-4-1-beanpod
     start gatekeeper-1-0
