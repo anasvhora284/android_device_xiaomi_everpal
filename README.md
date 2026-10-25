@@ -51,18 +51,28 @@ a recovery vibrator HAL (`vibrator/`), real battery percentage, and proper micro
 
 ## Installing
 
-> ⚠️ **Update your firmware first.** Your phone needs the firmware your ROM requires — current ROMs
-> need **HyperOS firmware**. Old MIUI 14 firmware has caused a bootloop. Make sure your ROM boots
-> *before* you install the recovery.
+> ⚠️ **Make sure your ROM boots before you install the recovery.**
 
-| File | Use it when |
+**Already have a custom recovery** (TWRP / OrangeFox / PitchBlack — many ROMs ship one in boot)?
+Flash `*-installer.zip` from it. That's it.
+
+**No custom recovery?**
+1. Fastboot mode: **Vol Down + Power**
+2. `fastboot boot <recovery>-everpal-<date>-fastboot-boot.img` — runs the recovery from RAM, **writes nothing**
+3. In the recovery: **Install** (or ADB sideload) `*-installer.zip`
+
+The installer patches **both slots** and keeps **your own kernel** and your ROM's first-stage fstab.
+
+| File | What it is |
 |---|---|
-| `*-installer.zip` | **Recommended.** Flash from any existing recovery. Patches **both slots**, keeps your kernel and your ROM's fstab. |
-| `*-flashable.img` | No recovery yet: `fastboot flash boot <img>` |
-| `*-RAMBOOT-TEST-DO-NOT-FLASH.img` | Maintainer testing only — never flash this. |
+| `*-installer.zip` | **The install — use this.** |
+| `*-fastboot-boot.img` | For `fastboot boot` only: a temporary recovery, nothing is written. |
+| `*-flashable.img` | ⚠️ Full boot image **including the Aqua kernel** — `fastboot flash`ing it **replaces your kernel**. Only for ROMs that already run Aqua. On ROMs with their own kernel (MIUI/HyperOS ports, stock) it causes a bootloop. |
+
+Verify the `.sha256sum` next to each file before flashing.
 
 After installing, reboot to recovery and unlock with your lockscreen PIN/pattern/password to
-decrypt `/data`. Always verify the `.sha256sum` next to each file.
+decrypt `/data`.
 
 Harmless red lines in the log: APEX loop-mount errors, `Unable to mount '/auto0'` (USB-OTG with
 nothing attached), and `Unable to mount '/data'` before you unlock.
