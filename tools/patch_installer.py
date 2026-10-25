@@ -11,7 +11,7 @@ so that copy is used as a fallback (crDroid's is identical to the one already in
 """
 import sys, zipfile
 
-REPO = "https://github.com/anasvhora284/android_device_xiaomi_everpal"
+REPO = "https://github.com/anasvhora284/recovery_device_xiaomi_everpal"
 
 def banner(date, flavour):
     name = "OrangeFox R12.0" if flavour == "ofox" else "PitchBlack 4.0"
