@@ -43,11 +43,17 @@ a recovery vibrator HAL (`vibrator/`), real battery percentage, and proper micro
 
 ## Tested
 
-| | ColorOS V2 A16 port | Infinity X 4.1 (Android 17) | crDroid 12.11 |
+On **evergo** only — **evergreen** and **opal** are untested, testers welcome.
+
+| ROM | Base | OrangeFox | PitchBlack |
 |---|---|---|---|
-| Installs, ROM still boots | ✅ | ✅ | ✅ |
-| Decrypts `/data` | n/a (port `/data` unencrypted) | ✅ pattern | ✅ |
-| ROM boots Enforcing afterwards | ✅ | ✅ | ✅ |
+| crDroid 12.11 | Android 16 | ✅ install, boot, decrypt | ✅ install, boot, decrypt |
+| Infinity X 4.1 | Android 17 | ✅ install, boot, decrypt, ROM sideload | ✅ install, boot, decrypt |
+| ColorOS V2 (port) | Android 16 | ✅ install, boot | ✅ install, boot |
+| Cryo OS 2.2 EU (HyperOS port) | HyperOS firmware | ✅ install, boot | not tested |
+| MemeOS (MIUI 14 port) | Android 13 | ❌ decrypts, but **doesn't boot after install** — investigating | not tested |
+
+ROMs boot SELinux **Enforcing** with the recovery installed.
 
 ## Installing
 
@@ -67,9 +73,8 @@ The installer patches **both slots** and keeps **your own kernel** and your ROM'
 |---|---|
 | `*-installer.zip` | **The install — use this.** |
 | `*-fastboot-boot.img` | For `fastboot boot` only: a temporary recovery, nothing is written. |
-| `*-flashable.img` | ⚠️ Full boot image **including the Aqua kernel** — `fastboot flash`ing it **replaces your kernel**. Only for ROMs that already run Aqua. On ROMs with their own kernel (MIUI/HyperOS ports, stock) it causes a bootloop. |
 
-Verify the `.sha256sum` next to each file before flashing.
+Verify downloads against `SHA256SUMS` in the same folder (`sha256sum -c SHA256SUMS`).
 
 After installing, reboot to recovery and unlock with your lockscreen PIN/pattern/password to
 decrypt `/data`.
