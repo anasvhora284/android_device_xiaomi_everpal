@@ -87,9 +87,14 @@ FOOTER_ANCHORS = [
     ("pbrp", 'ui_print "|------------Installation finished!-----------|"\n'),
 ]
 
+MARKER = "keep the ROM's own first-stage fstab"
+BANNER_MARKER = "everpal (unified)"
+
 def main(src, dst, date="unreleased"):
     zin = zipfile.ZipFile(src)
     s = zin.read(BIN).decode()
+    if MARKER in s or BANNER_MARKER in s:
+        raise SystemExit(f"{src} is already patched - patch the unmodified upstream zip instead")
     hits = 0
     for anchor, cpio in PATCHES:
         n = s.count(anchor)
