@@ -197,6 +197,9 @@ TW_INCLUDE_NTFS_3G := true
 TW_INCLUDE_PYTHON := true
 TARGET_USES_MKE2FS := true
 
+# Shown in the About screen of both recoveries — makes bug reports identifiable
+TW_DEVICE_VERSION := everpal-2.0
+
 # Logging (keeps logcat/dmesg available for bug reports)
 TWRP_INCLUDE_LOGCAT := true
 TARGET_USES_LOGD := true
