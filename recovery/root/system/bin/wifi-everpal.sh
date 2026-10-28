@@ -59,6 +59,12 @@ if [ ! -f /tmp/recovery/wpa_supplicant.conf ]; then
         > /tmp/recovery/wpa_supplicant.conf
 fi
 ln -sf /tmp/recovery/wpa_supplicant.conf /vendor/etc/wifi/wpa_supplicant.conf
+# wpa_supplicant drops to the wifi user (1010) on its own: it must read the config, write
+# <conf>.tmp next to it when saving networks, and own its control socket dir. mkdir -p made these
+# 0700/0600 root -> "Failed to open config file ... Permission denied", exit 255 (seen on evergo).
+chown 1010:1010 /vendor/etc/wifi /tmp/recovery/wpa_supplicant.conf /tmp/recovery/sockets
+chmod 0775 /vendor/etc/wifi
+chmod 0660 /tmp/recovery/wpa_supplicant.conf
 
 # Stock 4.14.186 may place modules on vendor_dlkm; Aqua 4.14.357 has WLAN built in.
 for suffix in "$SLOT" ""; do
