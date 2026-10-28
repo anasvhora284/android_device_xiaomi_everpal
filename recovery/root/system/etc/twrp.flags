@@ -26,7 +26,6 @@
 /odm_image			emmc		/dev/block/mapper/odm					flags=display="ODM Image";backup=1;flashimg=1;slotselect
 
 # Internal storage
-/storage			f2fs		/data/media/0						flags=display="Internal Storage";backup=1;usermrf;fsflags="bind";removable
 
 # IMEI / modem / calibration — backup only
 /nvram				emmc		/dev/block/by-name/nvram				flags=display="NVRAM (IMEI)";backup=1
