@@ -59,6 +59,9 @@ def footer():
     return "".join(f'ui_print "{t}"\n' for t in L)
 
 BIN = "META-INF/com/google/android/update-binary"
+# AERA zips also carry this copy of update-binary; AERA execs it instead when the zip is flashed from
+# AERA itself, so it must get the same patch or AERA-to-AERA updates lose the ROM's fstab again.
+AERA_BIN = "META-INF/com/google/android/aera-installer"
 
 def keep(cpio):  # before the ramdisk is replaced: save the ROM's fstabs from the unpacked stock ramdisk
     return (f'    # keep the ROM\'s own first-stage fstab (ports use a different partition layout)\n'
@@ -119,7 +122,9 @@ def main(src, dst, date="unreleased"):
 
     with zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED) as zout:
         for i in zin.infolist():
-            data = s.encode() if i.filename == BIN else zin.read(i)
+            if i.filename == AERA_BIN:
+                assert zin.read(AERA_BIN) == zin.read(BIN), "aera-installer differs from update-binary"
+            data = s.encode() if i.filename in (BIN, AERA_BIN) else zin.read(i)
             zout.writestr(i, data)
     print(f"patched {src} -> {dst} ({flavour}, banner+footer+fstab)")
 
