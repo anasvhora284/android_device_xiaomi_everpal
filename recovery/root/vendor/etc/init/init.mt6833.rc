@@ -3,9 +3,6 @@ on init
     setprop sys.usb.configfs 1
     export LD_LIBRARY_PATH /system/lib64:/vendor/lib64:/vendor/lib64/hw:/system/lib64/hw
 
-on fs
-    install_keyring
-
 on post-fs
     start vendor.boot-default
 
