@@ -5,7 +5,7 @@
 #   sudo bash aera_zip_qemu_test.sh <installer.zip> <rom boot.img> <recovery root dir> <outdir>
 set -eu
 ZIP=$1; ROMBOOT=$2; RROOT=$3; OUT=$4
-MKB=${AERA_SRC:-$HOME/android/AERA_16.0}/system/tools/mkbootimg #/AERA_16.0/system/tools/mkbootimg
+MKB=${AERA_SRC:-$HOME/android/AERA_16.0}/system/tools/mkbootimg
 rm -rf "$OUT"; mkdir -p "$OUT"; W=$(mktemp -d)
 
 # 1. slot images: a = ROM boot as is, b = ROM boot with a marker line in its first-stage fstab
