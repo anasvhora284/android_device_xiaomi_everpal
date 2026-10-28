@@ -30,6 +30,6 @@ cc_binary {
         "libcutils",
         "liblog",
         "libutils",
-        "android.hardware.vibrator-V1-ndk_platform",
+        "android.hardware.vibrator-V1-ndk",
     ],
 }

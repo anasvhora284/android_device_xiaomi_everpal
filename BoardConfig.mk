@@ -181,7 +181,7 @@ AERA_SUPPORT_INPUT_AIDL_HAPTICS := true
 AERA_RECOVERY_ADDITIONAL_RELINK_BINARY_FILES += \
     $(TARGET_OUT_EXECUTABLES)/vibrator-service.everpal-recovery
 AERA_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
-    $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.vibrator-V1-ndk_platform.so
+    $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.vibrator-V1-ndk.so
 
 # Battery %: comes from MediaTek's fuelgauged, started by init.mt6833.rc (see there)
 
