@@ -37,3 +37,4 @@ service wpa_supplicant /system/bin/wpa_supplicant -Dnl80211 -iwlan0 -dd -O/tmp/r
     user root
     group root wifi inet net_admin
     seclabel u:r:recovery:s0
+    stdio_to_kmsg

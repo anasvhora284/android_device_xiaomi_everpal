@@ -50,13 +50,15 @@ for pattern in WMT_SOC.cfg WIFI_RAM_CODE_soc2_2_* soc2_2_ram_*; do
         [ -e "/vendor/firmware/$name" ] || ln -s "$file" "/vendor/firmware/$name"
     done
 done
-[ -e /vendor/etc/wifi/wpa_supplicant.conf ] || {
-    if [ -f "$ROM_VENDOR/etc/wifi/wpa_supplicant.conf" ]; then
-        ln -s "$ROM_VENDOR/etc/wifi/wpa_supplicant.conf" /vendor/etc/wifi/wpa_supplicant.conf
-    else
-        echo 'ctrl_interface=/tmp/recovery/sockets' > /vendor/etc/wifi/wpa_supplicant.conf
-    fi
-}
+# Own writable config, never the ROM's: its ctrl_interface=wlan0 needs Android's init socket
+# (wpa_wlan0) and its P2P/HS2.0 driver_param lines are for the framework -> supplicant exits 255.
+# /vendor/etc/wifi/wpa_supplicant.conf is the path AERA's WLAN code and our rc both use.
+if [ ! -f /tmp/recovery/wpa_supplicant.conf ]; then
+    mkdir -p /tmp/recovery/sockets
+    printf 'ctrl_interface=/tmp/recovery/sockets\nupdate_config=1\npmf=1\nsae_pwe=2\n' \
+        > /tmp/recovery/wpa_supplicant.conf
+fi
+ln -sf /tmp/recovery/wpa_supplicant.conf /vendor/etc/wifi/wpa_supplicant.conf
 
 # Stock 4.14.186 may place modules on vendor_dlkm; Aqua 4.14.357 has WLAN built in.
 for suffix in "$SLOT" ""; do
