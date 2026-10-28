@@ -51,11 +51,10 @@ AB_OTA_POSTINSTALL_CONFIG += \
     FILESYSTEM_TYPE_vendor=ext4 \
     POSTINSTALL_OPTIONAL_vendor=true
 
-# Boot control (AOSP misc-based, same implementation family the ROM uses)
+# Boot control: AIDL AOSP misc-based HAL, the same one the ROM ships (boot-service.default). The HIDL
+# boot@1.2-service used on the 12.1 base exits immediately on Android 16 (restart loop, no slot control).
 PRODUCT_PACKAGES += \
-    android.hardware.boot@1.2-impl \
-    android.hardware.boot@1.2-impl.recovery \
-    android.hardware.boot@1.2-service
+    android.hardware.boot-service.default_recovery
 
 # Gatekeeper: AOSP HIDL service in recovery, backed by the Beanpod HAL (vendor/lib64/hw/gatekeeper.beanpod.so)
 PRODUCT_PACKAGES += \
