@@ -13,8 +13,9 @@ import sys, zipfile
 
 REPO = "https://github.com/anasvhora284/recovery_device_xiaomi_everpal"
 
-def banner(date, flavour):
-    name = "OrangeFox R12.0" if flavour == "ofox" else "PitchBlack 4.0"
+def banner(date, flavour, aera=False):
+    # AERA is an OrangeFox fork: same installer layout ("ofox" anchors), different name
+    name = "AERA R1.0 (TEST)" if aera else "OrangeFox R12.0" if flavour == "ofox" else "PitchBlack 4.0"
     L = [
       "",
       "=================================================",
@@ -107,7 +108,8 @@ def main(src, dst, date="unreleased"):
     for f, anchor, _ in BANNER_ANCHORS:
         if s.count(anchor) == 1:
             flavour = f
-            s = s.replace(anchor, banner(date, f) + anchor)
+            aera = "META-INF/com/google/android/aera-installer" in zin.namelist()
+            s = s.replace(anchor, banner(date, f, aera) + anchor)
             break
     assert flavour, "no known banner anchor"
     for f, anchor in FOOTER_ANCHORS:
