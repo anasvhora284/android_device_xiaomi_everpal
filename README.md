@@ -11,13 +11,16 @@ mkdir -p ~/android/AERA_16.0
 cd ~/android/AERA_16.0
 repo init -u https://github.com/AERA-Recovery/android_manifest.git -b aera-16.0
 repo sync -c --force-sync --no-clone-bundle --no-tags -j$(nproc)
-git clone -b aera-16.0 <everpal-tree-url> device/xiaomi/everpal
+git clone -b aera-16.0 https://github.com/anasvhora284/recovery_device_xiaomi_everpal device/xiaomi/everpal
+# AERA_ENABLE_WLAN refuses to build without it:
+git clone --depth=1 https://android.googlesource.com/platform/external/wpa_supplicant_8 -b android16-s2-release external/wpa_supplicant_8
+export AERA_BUILD_DEVICE=everpal
 source build/envsetup.sh
 lunch twrp_everpal-bp2a-eng
-mka adbd recoveryimage
+mka adbd bootimage   # recovery-as-boot: the recovery IS boot.img on everpal
 ```
 
-Replace `<everpal-tree-url>` with the URL of this repository. The expected image location is `out/target/product/everpal/`. No AERA installer or flash method has been verified. The scripts under `tools/`, including the build gates and `patch_installer.py`, target the older OrangeFox/PitchBlack builds and have not been adapted to AERA.
+The expected image location is `out/target/product/everpal/`. No AERA installer or flash method has been verified. The scripts under `tools/`, including the build gates and `patch_installer.py`, target the older OrangeFox/PitchBlack builds and have not been adapted to AERA.
 
 ## Device notes
 
