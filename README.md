@@ -1,122 +1,36 @@
-# device/xiaomi/everpal — OrangeFox & PitchBlack recovery tree
+# Xiaomi everpal — AERA Recovery (Android 16)
 
-Unified recovery tree for the MT6833 (Dimensity 810) Xiaomi family sold as
-**Redmi Note 11T 5G / POCO M4 Pro 5G / Redmi Note 11S 5G**:
-`evergo`, `evergreen`, `everpal`, `opal`.
+Unified recovery tree for the MT6833 Xiaomi `evergo`, `evergreen`, `everpal`, and `opal` family. The AERA product remains `twrp_everpal`; the lunch target is `twrp_everpal-bp2a-eng`.
 
-One tree builds both recoveries:
+**Status: untested, builds not yet verified.** The expected recovery features are a software-rendered UI, FBEv2 and metadata decryption, Wi-Fi, and PC Connection. Wi-Fi uses the installed ROM's MediaTek vendor binaries, firmware, and (on stock kernels) kernel modules. The on-phone browser is Adreno-only upstream; mobile data has not been ported. None of these features has been validated in an AERA build or on a device yet.
 
-| Recovery | Manifest | Lunch target |
-|---|---|---|
-| OrangeFox R12.0 | `fox_12.1` | `twrp_everpal-eng` |
-| PitchBlack 4.0 | `android-12.1` (`vendor/pb`) | `pb_everpal-eng` |
-
-## What is different about this tree
-
-The device ships Beanpod TEE + FBEv2 with metadata encryption, and the recovery boots on
-**whatever kernel the installed ROM put in `boot`**. Three things follow from that, and they are
-the reason this tree decrypts on ROMs other trees fail on:
-
-1. **`recovery/root/system/bin/prepdecrypt-everpal.sh`** — before keymaster starts, it mounts the
-   installed ROM's `system`/`vendor` read-only and copies that ROM's exact
-   `ro.build.version.{release,sdk,security_patch}` and `ro.vendor.build.security_patch` into the
-   recovery. Beanpod binds keys to those values, so a recovery that looks older than the ROM
-   cannot unwrap the `/metadata` key (`Unable to decrypt metadata encryption`). Values are copied
-   verbatim, never raised, so keys are never upgraded. Falls back to the built-in values if the
-   ROM's partitions can't be read.
-2. **`recovery/root/init.recovery.mt6833.rc`** — forces SELinux permissive at `early-init`. ROMs
-   without `androidboot.selinux=permissive` on the cmdline leave init unable to create the fscrypt
-   keyring (`Unable to find device keyring`), which breaks FBE decryption. Recovery only; a normal
-   Android boot still runs Enforcing.
-3. **Service ordering** (`recovery/root/vendor/etc/init/init.mt6833.rc`) — `teei_daemon` and
-   `gatekeeper-1-0` start immediately from the recovery's own `/vendor`; only
-   `keymaster-4-1-beanpod` waits on `prepdecrypt`. PitchBlack mounts the ROM's vendor over
-   `/vendor`, which hides `gatekeeper@1.0-service-recovery` and otherwise hangs on
-   "Trying to decrypt".
-
-The installer also **keeps the installed ROM's first-stage `fstab.mt6833`** when it repacks the
-boot image, instead of overwriting it with the tree's copy — overwriting it bootloops ported ROMs
-whose fstab differs from stock.
-
-Also here: an AOSP gatekeeper@1.0 HIDL service backed by `gatekeeper.beanpod.so` (`gatekeeper/`),
-a recovery vibrator HAL (`vibrator/`), real battery percentage, and proper microSD labelling.
-
-## Tested
-
-On **evergo** only — **evergreen** and **opal** are untested, testers welcome.
-
-| ROM | Base | OrangeFox | PitchBlack |
-|---|---|---|---|
-| crDroid 12.11 | Android 16 | ✅ install, boot, decrypt | ✅ install, boot, decrypt |
-| Infinity X 4.1 | Android 17 | ✅ install, boot, decrypt, ROM sideload | ✅ install, boot, decrypt |
-| ColorOS V2 (port) | Android 16 | ✅ install, boot | ✅ install, boot |
-| Cryo OS 2.2 EU (HyperOS port) | HyperOS firmware | ✅ install, boot | not tested |
-| MemeOS (MIUI 14 port) | Android 13 | ❌ decrypts, but **doesn't boot after install** — investigating | not tested |
-
-ROMs boot SELinux **Enforcing** with the recovery installed.
-
-## Installing
-
-> ⚠️ **Make sure your ROM boots before you install the recovery.**
-
-**Already have a custom recovery** (TWRP / OrangeFox / PitchBlack — many ROMs ship one in boot)?
-Flash `*-installer.zip` from it. That's it.
-
-**No custom recovery?**
-1. Fastboot mode: **Vol Down + Power**
-2. `fastboot boot <recovery>-everpal-<date>-fastboot-boot.img` — runs the recovery from RAM, **writes nothing**
-3. In the recovery: **Install** (or ADB sideload) `*-installer.zip`
-
-The installer patches **both slots** and keeps **your own kernel** and your ROM's first-stage fstab.
-
-| File | What it is |
-|---|---|
-| `*-installer.zip` | **The install — use this.** |
-| `*-fastboot-boot.img` | For `fastboot boot` only: a temporary recovery, nothing is written. |
-
-Verify downloads against `SHA256SUMS` in the same folder (`sha256sum -c SHA256SUMS`).
-
-After installing, reboot to recovery and unlock with your lockscreen PIN/pattern/password to
-decrypt `/data`.
-
-Harmless red lines in the log: APEX loop-mount errors, `Unable to mount '/auto0'` (USB-OTG with
-nothing attached), and `Unable to mount '/data'` before you unlock.
-
-## Building
-
-`tools/build_recovery.sh` is the full pipeline: it syncs the manifest, adds the `external/nano`
-dependency, builds `ofox`/`pbrp` × `flashable`/`ramboot`, and packs the installer zips.
-`vendorsetup.sh` holds the OrangeFox `FOX_*`/`OF_*` settings (read only for OrangeFox builds;
-PitchBlack ignores them).
+## Build
 
 ```bash
-bash tools/build_recovery.sh both     # or: ofox | pbrp
+mkdir -p ~/android/AERA_16.0
+cd ~/android/AERA_16.0
+repo init -u https://github.com/AERA-Recovery/android_manifest.git -b aera-16.0
+repo sync -c --force-sync --no-clone-bundle --no-tags -j$(nproc)
+git clone -b aera-16.0 <everpal-tree-url> device/xiaomi/everpal
+source build/envsetup.sh
+lunch twrp_everpal-bp2a-eng
+mka adbd recoveryimage
 ```
 
-Four gates run on every artifact and the build fails if any of them does:
+Replace `<everpal-tree-url>` with the URL of this repository. The expected image location is `out/target/product/everpal/`. No AERA installer or flash method has been verified. The scripts under `tools/`, including the build gates and `patch_installer.py`, target the older OrangeFox/PitchBlack builds and have not been adapted to AERA.
 
-| Script | Checks |
-|---|---|
-| `tools/check_tree.py` | tree vs. the reference crDroid boot image (fstab, props, partition layout) |
-| `tools/check_image.py` | the built boot image: header version, ramdisk contents, cmdline |
-| `tools/check_zip.py` | the installer zip installs exactly the ramdisk that was built |
-| `tools/verify_patched.py` | the post-build patch landed |
+## Device notes
 
-`tools/patch_installer.py` runs after the upstream installer zip is produced. It injects the
-"keep the ROM's first-stage fstab" logic described above, plus this build's banner and footer.
-Build from the tree alone and you get a working recovery, but **not** that fstab protection —
-run the patcher, or port its logic, if you repackage the zip yourself.
+The recovery runs on the installed ROM's boot kernel, either Aqua 4.14.357 or Xiaomi stock 4.14.186. The bundled prebuilt kernel and DTB are for image creation; a recovery installer must preserve the ROM's kernel and first-stage fstab. AERA installer behavior has not been verified for this tree.
 
-## Reporting a problem
+Beanpod keymaster must see the installed ROM's real OS version and security patch. `prepdecrypt-everpal.sh` reads them from the ROM's system and vendor partitions before the keymaster service starts. The built-in fallback stays at Android 16, platform patch `2026-08-01`, and vendor patch `2024-02-01`. Do not use future version or patch spoofing: it caused `KEY_REQUIRES_UPGRADE` on this device. Recovery sets SELinux permissive at early init so the fscrypt keyring can be created. The TEE and gatekeeper start immediately; only keymaster waits for prepdecrypt.
 
-Open an issue with: your ROM name and version, which recovery and its build date (in the file
-name, in the install banner, and in OrangeFox's About screen), what you did, and
-`/tmp/recovery.log` — in recovery: `adb pull /tmp/recovery.log`.
+Wi-Fi is requested by AERA after prepdecrypt. The helper mounts the installed ROM vendor read only at a private path and starts its WMT stack. Aqua has WLAN built in; for stock kernels the helper tries the ROM's `connfem`, `wmt_drv`, `wmt_chrdev_wifi`, and `wlan_drv_gen4m` modules. No Wi-Fi blobs or modules are included here.
 
 ## Credits
 
-- The **OrangeFox** and **PitchBlack Recovery** teams
-- The original 2023 `evergo` TWRP tree this started from
+- AERA Recovery, OrangeFox Recovery, and PitchBlack Recovery teams
+- The original 2023 `evergo` TWRP tree
 - Maintainer: **aetomtomy**
 
 Licensed under Apache-2.0 — see [LICENSE](LICENSE).

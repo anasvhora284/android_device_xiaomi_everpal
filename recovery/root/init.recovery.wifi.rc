@@ -1,0 +1,39 @@
+# MediaTek CONNAC WLAN. The AERA UI requests bring-up with sys.aera.wlan.up=1.
+# No WLAN service runs during boot or before the Beanpod prepdecrypt step.
+on property:sys.aera.wlan.up=1 && property:vendor.prepdecrypt.everpal.done=1
+    setprop sys.aera.wlan.up 0
+    start aera-wifi-everpal
+
+on property:wifi.driver.ready=true
+    mkdir /tmp/recovery 0777 root root
+    mkdir /tmp/recovery/sockets 0777 root root
+    start wpa_supplicant
+
+service aera-wifi-everpal /system/bin/wifi-everpal.sh start
+    disabled
+    oneshot
+    user root
+    group root wifi inet net_admin
+    seclabel u:r:recovery:s0
+    stdio_to_kmsg
+
+service aera-wmt-loader /system/bin/wifi-everpal.sh loader
+    disabled
+    oneshot
+    user root
+    group root wifi inet net_admin
+    seclabel u:r:recovery:s0
+    stdio_to_kmsg
+
+service aera-wmt-launcher /system/bin/wifi-everpal.sh launcher
+    disabled
+    user root
+    group root wifi inet net_admin
+    seclabel u:r:recovery:s0
+    stdio_to_kmsg
+
+service wpa_supplicant /system/bin/wpa_supplicant -Dnl80211 -iwlan0 -dd -O/tmp/recovery/sockets -c/vendor/etc/wifi/wpa_supplicant.conf
+    disabled
+    user root
+    group root wifi inet net_admin
+    seclabel u:r:recovery:s0
