@@ -7,6 +7,12 @@
 
 LOCAL_PATH := device/xiaomi/everpal
 
+# MT6833 and the bundled 4 KiB-page ELF prebuilts do not use 16 KiB pages.
+PRODUCT_CHECK_PREBUILT_MAX_PAGE_SIZE := false
+
+PRODUCT_COPY_FILES += \
+    system/core/libprocessgroup/profiles/task_profiles.json:recovery/root/system/etc/task_profiles.json
+
 # Kept from the proven OrangeFox tree
 $(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
 
@@ -19,6 +25,8 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/developer_gsi_keys.mk)
 PRODUCT_SHIPPING_API_LEVEL := 30
 PRODUCT_TARGET_VNDK_VERSION := 31
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
+
+$(call inherit-product, $(LOCAL_PATH)/aera_everpal.mk)
 
 # A/B OTA install support (payload.bin ROM zips)
 PRODUCT_PACKAGES += \

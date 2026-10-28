@@ -3,9 +3,9 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/twrp_everpal.mk \
-    $(LOCAL_DIR)/pb_everpal.mk
+    $(LOCAL_DIR)/twrp_everpal.mk
 
 COMMON_LUNCH_CHOICES := \
-    twrp_everpal-eng \
-    pb_everpal-eng
+    twrp_everpal-user \
+    twrp_everpal-userdebug \
+    twrp_everpal-eng

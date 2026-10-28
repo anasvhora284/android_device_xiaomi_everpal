@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# OrangeFox (fox_12.1) product. Lunch: twrp_everpal-eng
+# AERA (aera-16.0) product. Lunch: twrp_everpal-bp2a-eng
 
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)

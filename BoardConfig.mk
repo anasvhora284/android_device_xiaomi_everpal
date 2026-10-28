@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Recovery tree for Xiaomi evergo / evergreen / opal (unified "everpal", MT6833).
-# Shared by OrangeFox (fox_12.1) and PitchBlack (android-12.1); see twrp_everpal.mk / pb_everpal.mk.
+# AERA Recovery (aera-16.0).
 # Ported from OrangeFoxRecovery/device_xiaomi_everpal (fox_12.1); kernel, dtb, fstab and TEE blobs
 # are taken from Addster09's crDroid 12.11 (lineage-23.2) so decryption matches that ROM family.
 #
@@ -16,6 +16,7 @@ DEVICE_PATH := device/xiaomi/everpal
 ALLOW_MISSING_DEPENDENCIES := true
 BUILD_BROKEN_DUP_RULES := true
 BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
+BUILD_BROKEN_PLUGIN_VALIDATION := soong-libaosprecovery_defaults soong-libguitwrp_defaults soong-libminuitwrp_defaults soong-vold_defaults
 
 # A/B — same partition set as the lineage-23.2 ROM tree (no dtbo / odm_dlkm / system_dlkm on everpal ROMs)
 AB_OTA_UPDATER := true
@@ -62,6 +63,7 @@ BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2
 BOARD_KERNEL_CMDLINE += androidboot.init_fatal_reboot_target=recovery
 BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
 BOARD_BOOTIMG_HEADER_VERSION := 2
+BOARD_BOOT_HEADER_VERSION := 2
 BOARD_KERNEL_IMAGE_NAME := Image.gz
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/Image.gz
@@ -112,8 +114,10 @@ TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 
 # Recovery
+TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 RECOVERY_SDCARD_ON_DATA := true
+AERA_SKIP_ADDITIONAL_FSTAB := true
 
 # AVB — same key/algorithm/rollback index as crDroid's boot.img footer (testkey_rsa2048, index 1)
 BOARD_AVB_ENABLE := true
@@ -137,11 +141,11 @@ PLATFORM_VERSION := 16
 PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
 
 # Decryption — FBEv2 + metadata encryption via MediaTek Microtrust/Beanpod keymaster 4.1
-TW_INCLUDE_CRYPTO := true
-TW_INCLUDE_CRYPTO_FBE := true
-TW_INCLUDE_FBE_METADATA_DECRYPT := true
-TW_USE_FSCRYPT_POLICY := 2
-TW_PREPARE_DATA_MEDIA_EARLY := true
+AERA_INCLUDE_CRYPTO := true
+AERA_INCLUDE_CRYPTO_FBE := true
+AERA_INCLUDE_FBE_METADATA_DECRYPT := true
+AERA_USE_FSCRYPT_POLICY := 2
+AERA_PREPARE_DATA_MEDIA_EARLY := true
 
 # Every library the Beanpod keymaster service links against (readelf NEEDED) that is not a vendor blob
 TARGET_RECOVERY_DEVICE_MODULES += \
@@ -151,7 +155,7 @@ TARGET_RECOVERY_DEVICE_MODULES += \
     libkeymaster41 \
     libkeymaster4_1support \
     libkeymaster_messages
-TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
+AERA_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.keymaster@4.0.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.keymaster@4.1.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/libkeymaster4.so \
@@ -160,21 +164,23 @@ TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/libkeymaster_messages.so
 
 # TWRP UI / hardware
-TW_THEME := portrait_hdpi
-TW_EXTRA_LANGUAGES := true
-TW_FRAMERATE := 90
-TW_SCREEN_BLANK_ON_BOOT := true
-TW_INPUT_BLACKLIST := "hbtp_vm"
-TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
-TW_MAX_BRIGHTNESS := 2047
-TW_DEFAULT_BRIGHTNESS := 1024
-TW_EXCLUDE_DEFAULT_USB_INIT := true
+AERA_THEME := portrait_hdpi
+AERA_EXTRA_LANGUAGES := true
+AERA_FRAMERATE := 90
+AERA_SCREEN_BLANK_ON_BOOT := true
+AERA_INPUT_BLACKLIST := "hbtp_vm"
+AERA_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
+AERA_MAX_BRIGHTNESS := 2047
+AERA_DEFAULT_BRIGHTNESS := 1024
+AERA_EXCLUDE_DEFAULT_USB_INIT := true
+AERA_UI_ADAPTIVE_RESOLUTION := true
+AERA_EXCLUDE_APEX := true
 
 # Haptics: TWRP's AIDL client -> vibrator/ service -> awinic_haptic FF input device
-TW_SUPPORT_INPUT_AIDL_HAPTICS := true
-TW_RECOVERY_ADDITIONAL_RELINK_BINARY_FILES += \
+AERA_SUPPORT_INPUT_AIDL_HAPTICS := true
+AERA_RECOVERY_ADDITIONAL_RELINK_BINARY_FILES += \
     $(TARGET_OUT_EXECUTABLES)/vibrator-service.everpal-recovery
-TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
+AERA_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.vibrator-V1-ndk_platform.so
 
 # Battery %: comes from MediaTek's fuelgauged, started by init.mt6833.rc (see there)
@@ -184,29 +190,19 @@ TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
 #   EVERPAL_RAMBOOT_TEST=1  -> always boots recovery; ONLY for `fastboot boot` (never flash it:
 #                              a flashed copy would boot to recovery forever).
 #   unset (default)         -> flashable; follows the bootloader (Android normally, recovery on key combo).
-# TW_NO_FASTBOOT_BOOT is always set so the vendor config never adds the flag on its own.
-TW_NO_FASTBOOT_BOOT := true
+# AERA_NO_FASTBOOT_BOOT prevents the vendor config from adding the flag on its own.
+AERA_NO_FASTBOOT_BOOT := true
 ifeq ($(EVERPAL_RAMBOOT_TEST),1)
     BOARD_KERNEL_CMDLINE += twrpfastboot=1
 endif
 
 # Tools
-TW_USE_TOOLBOX := true
-TW_INCLUDE_RESETPROP := true
-TW_INCLUDE_NTFS_3G := true
-TW_INCLUDE_PYTHON := true
+AERA_USE_TOOLBOX := true
+AERA_INCLUDE_RESETPROP := true
+AERA_INCLUDE_NTFS_3G := true
+AERA_INCLUDE_PYTHON := true
 TARGET_USES_MKE2FS := true
 
 # Logging (keeps logcat/dmesg available for bug reports)
-TWRP_INCLUDE_LOGCAT := true
+AERA_INCLUDE_LOGCAT := true
 TARGET_USES_LOGD := true
-
-# Recovery-flavour specific settings
-ifneq ($(filter pb_everpal,$(TARGET_PRODUCT)),)
-    # PitchBlack (vendor/pb pb-12.1). PB's code tests MAX_BRIGHTNESS but reads BRIGHTNESS_MAX, so set both.
-    PB_TORCH_PATH := "/system/flashlight"
-    PB_TORCH_MAX_BRIGHTNESS := 1
-    PB_TORCH_BRIGHTNESS_MAX := 1
-    PB_DISABLE_DEFAULT_DM_VERITY := true
-    PB_DISABLE_DEFAULT_TREBLE_COMP := true
-endif
